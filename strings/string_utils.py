@@ -45,11 +45,10 @@ class stringUtils():
     def countCharInString(val,char_count):
         return val.count(char_count)
         
-def main():    
-    sbstr = string_utils()
+def main():  
     email = input("Please input email:").strip()        
-    user_name, domain_name = sbstr.getUserAndDomain(email)
-    sbstr.printMsg(user_name, domain_name)
+    user_name, domain_name = stringUtils.getUserAndDomain(email)
+    stringUtils.printMsg(user_name, domain_name)
 
 if __name__ == "__main__":
         main()

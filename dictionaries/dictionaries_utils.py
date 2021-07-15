@@ -19,7 +19,7 @@ def main():
     print(f'dict: {my_dict}')  
     print(f'get values by key = city :{_dict.getFieldByKey("city")}')
 
-    #add new values
+    #add new key and values
     _dict.addToDict("leader","Nguyen Tat Thanh")
     print(f'after add values: {_dict.MY_DICTIONS}')
 

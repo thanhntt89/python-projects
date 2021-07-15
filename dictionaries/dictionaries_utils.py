@@ -1,5 +1,5 @@
 ﻿class dictionariesUtils():
-    MY_DICTIONS = {'city': 'Ha Noi','popular':8}
+    MY_DICTIONS = {}
 
     def create_dict(self):
         return self.MY_DICTIONS
@@ -15,7 +15,11 @@
 
 def main():
     _dict = dictionariesUtils()
+    _dict.addToDict("city","Ha Noi")
+    _dict.addToDict("popular",8)
+
     my_dict = _dict.create_dict()
+    
     print(f'dict: {my_dict}')  
     print(f'get values by key = city :{_dict.getFieldByKey("city")}')
 

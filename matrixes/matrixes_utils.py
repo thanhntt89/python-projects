@@ -13,6 +13,9 @@ class matrixes():
     def addTowMatrix(self,matrixX,matrixY):
         return [[matrixX[i][j] + matrixY[i][j] for j in range(len(matrixX[0]))] for i in range(len(matrixX))]
 
+    def multiplyTowMatrixUsingNetListComprehension(self,matrixX,matrixY):
+        return [[sum(a*b for a,b in zip(x_row,y_col)) for y_col in zip(*matrixY)] for x_row in matrixX]
+    
 def main():
     _matrix = matrixes()
 
@@ -25,11 +28,12 @@ def main():
     print(f'Convert convert_to_array:{_matrix.convert_to_array(matrix)}') 
 
     matrixX = [[12,7,5],[6,3,5]]
-    matrixY =[[3,6,2],[7,8,2]]
+    matrixY =[[3,6,9],[7,8,2]]
 
     print(f'MatrixX:{matrixX}\nmatrixY:{matrixY}')
     print(f'MatrixX + MatrixY = {_matrix.addTowMatrix(matrixX,matrixY)}')
 
+    print(f'MatrixX*MatrixY = {_matrix.multiplyTowMatrixUsingNetListComprehension(matrixX,matrixY)}')
 
 if __name__ == '__main__':
     main()

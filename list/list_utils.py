@@ -50,8 +50,6 @@ def main():
     #reversed list
     listUtils.reversedList(val)
     print(f'Reversed1:{val}')
-    listUtils.reverseString(val)
-    print(f'Reversed2:{val}')
 
     SUM = listUtils.sumList(val)
     print(f'Sum:{SUM}')

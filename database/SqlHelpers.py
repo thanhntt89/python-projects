@@ -23,7 +23,7 @@ class SqlHelpers():
             return False
     
     @staticmethod
-    def ExecuteNonQuery(connection_string,query):
+    def ExecuteDataset(connection_string,query):
         con = odbc.connect(connection_string)
         con.timeout = SqlHelpers.COMMAND_TIMEOUT
         cur = con.cursor()
@@ -44,7 +44,7 @@ def main():
 
     #query = 'select [利用者ID],[権限グループ],[利用者名] from  [Wii].[dbo].[Fes利用者]'
     query = 'EXEC [dbo].[select_test]'
-    user_group = SqlHelpers.ExecuteNonQuery(SqlHelpers.connection_string, query)
+    user_group = SqlHelpers.ExecuteDataset(SqlHelpers.connection_string, query)
     print('User_groups:\n')
     #print(user_group)
     for ug in user_group:

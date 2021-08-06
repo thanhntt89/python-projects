@@ -22,6 +22,7 @@ class SqlHelpers():
         except:
             return False
     
+    #Get data in table from database
     @staticmethod
     def ExecuteDataset(connection_string,query):
         con = odbc.connect(connection_string)
@@ -44,10 +45,10 @@ def main():
 
     #query = 'select [利用者ID],[権限グループ],[利用者名] from  [Wii].[dbo].[Fes利用者]'
     query = 'EXEC [dbo].[select_test]'
-    user_group = SqlHelpers.ExecuteDataset(SqlHelpers.connection_string, query)
+    user_group_dataset = SqlHelpers.ExecuteDataset(SqlHelpers.connection_string, query)
     print('User_groups:\n')
     #print(user_group)
-    for ug in user_group:
+    for ug in user_group_dataset:
         print(ug)
 
 if __name__ == "__main__":

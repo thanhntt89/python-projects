@@ -14,7 +14,8 @@ class SqlHelpers():
     def test_connection():        
         try:            
             con = odbc.connect(SqlHelpers.connection_string)
-            cur = con.cursor()
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT
+            cur = con.cursor()            
             query ="SELECT @@version;"
             cur.execute(query)            
             return True
@@ -24,8 +25,12 @@ class SqlHelpers():
     @staticmethod
     def ExecuteNonQuery(connection_string,query):
         con = odbc.connect(connection_string)
+        con.timeout = SqlHelpers.COMMAND_TIMEOUT
         cur = con.cursor()
-        cur.execute(query)            
+        cur.execute(query)  
+        return cur.fetchall() 
+
+             
 
 def main():
     SqlHelpers.SERVER ='WINSERVER2016'
@@ -33,9 +38,17 @@ def main():
     SqlHelpers.PASSWORDS ='W_iiAdmin00000' 
     SqlHelpers.USER_NAME ='wiiAdmin'
 
-    print('Sql connection string :'+ SqlHelpers.connection_string)
+    #print('Sql connection string :'+ SqlHelpers.connection_string)
 
-    print('Test connected:' + str(SqlHelpers.test_connection()))
+    #print('Test connected:' + str(SqlHelpers.test_connection()))
+
+    #query = 'select [利用者ID],[権限グループ],[利用者名] from  [Wii].[dbo].[Fes利用者]'
+    query = 'EXEC [dbo].[select_test]'
+    user_group = SqlHelpers.ExecuteNonQuery(SqlHelpers.connection_string, query)
+    print('User_groups:\n')
+    #print(user_group)
+    for ug in user_group:
+        print(ug)
 
 if __name__ == "__main__":
     main()

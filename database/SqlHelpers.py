@@ -38,7 +38,7 @@ class SqlHelpers(object):
         dat_row = cur.fetchall()
         columns = [cols[0] for cols in cur.description] 
         data = [dict(zip(columns, row)) for row in dat_row]
-        return data #[columns,dat_row]
+        return data 
 
     @staticmethod
     def ExecutePandas(connection_string, query):
@@ -48,16 +48,25 @@ class SqlHelpers(object):
         data = pd.read_sql_query(query,con)
         return data
 
+    ###############################
+    # SQL running with query parameter character ? and values array
+    ###############################
     @staticmethod
-    def ExecuteNonQuery(connection_string, query):
+    def ExecuteNonQuery(connection_string, query,vales):
         try:
             con = odbc.connect(connection_string)
-            con.timeout = SqlHelpers.COMMAND_TIMEOUT
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT           
             cur = con.cursor() 
-            cur.execute(query)
+            cur.execute(query, vales)
+            con.commit()
+            cur.close()
+            con.close()
         except ValueError as e:
+            cur.close()
+            con.rollback()
+            con.close()
             raise e.__traceback__
-             
+
 
 def main():
     SqlHelpers.SERVER ='WINSERVER2016'
@@ -68,9 +77,9 @@ def main():
     #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
 
     #test execute datasets
-    Test_ExecuteList(connection_string)
+    #Test_ExecuteList(connection_string)
     #Test_ExecutePandas(connection_string)
-    #Test_ExecuteNonQuery(connection_string)
+    Test_ExecuteNonQuery(connection_string)
 
 
 def Test_ExecutePandas(connection_string):
@@ -84,8 +93,10 @@ def Test_ExecutePandas(connection_string):
 
 def Test_ExecuteNonQuery(connection_string):
     try:           
-        query ='INSERT INTO wii.dbo.[FestaVideoLock]([ContentType]) VALUES(12)'
-        SqlHelpers.ExecuteNonQuery(connection_string,query)
+        query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)'     
+        values =('14')
+
+        SqlHelpers.ExecuteNonQuery(connection_string,query,values)      
     except ValueError as e:
         print(f'error exception:{e}')
 

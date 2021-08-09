@@ -30,14 +30,15 @@ class SqlHelpers(object):
     #Get data in table from database
     #Return columns, data row
     @staticmethod
-    def ExecuteDataset(connection_string,query):
+    def ExecuteList(connection_string,query):
         con = odbc.connect(connection_string)
         con.timeout = SqlHelpers.COMMAND_TIMEOUT
         cur = con.cursor()        
         cur.execute(query) 
         dat_row = cur.fetchall()
-        columns = [cols[0] for cols in cur.description]
-        return [columns,dat_row]
+        columns = [cols[0] for cols in cur.description] 
+        data = [dict(zip(columns, row)) for row in dat_row]
+        return data #[columns,dat_row]
 
     @staticmethod
     def ExecutePandas(connection_string, query):
@@ -67,9 +68,9 @@ def main():
     #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
 
     #test execute datasets
-    #test_executedataset(connection_string)
-    Test_ExecutePandas(connection_string)
-    #test_executenonquery(connection_string)
+    Test_ExecuteList(connection_string)
+    #Test_ExecutePandas(connection_string)
+    #Test_ExecuteNonQuery(connection_string)
 
 
 def Test_ExecutePandas(connection_string):
@@ -81,25 +82,25 @@ def Test_ExecutePandas(connection_string):
     except ValueError as e:
         print(f'error exception:{e}')
 
-def test_executenonquery(connection_string):
-    try:    
-        print('Sql connection string :'+ connection_string)
-        print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
-        query ='INSERT INTO [FestaVideoLock]([ContentType]) VALUES(12)'
+def Test_ExecuteNonQuery(connection_string):
+    try:           
+        query ='INSERT INTO wii.dbo.[FestaVideoLock]([ContentType]) VALUES(12)'
         SqlHelpers.ExecuteNonQuery(connection_string,query)
     except ValueError as e:
         print(f'error exception:{e}')
 
-def test_executedataset(connection_string):    
+def Test_ExecuteList(connection_string):    
     print('Sql connection string :'+ connection_string)
     query = 'EXEC [dbo].[select_test]'
-    columns , user_group_dataset = SqlHelpers.ExecuteDataset(connection_string, query)
+    user_group_dataset = SqlHelpers.ExecuteList(connection_string, query)
 
     print('User_groups:\n')
-    print(columns)
-    #print(user_group)
-    for ug in user_group_dataset:
-        print(ug)
+    #print(columns)
+    print(user_group_dataset)
+    # for ug in user_group_dataset:
+    #     print(ug)
+
+    print(type(user_group_dataset))
 
 if __name__ == "__main__":
     main()

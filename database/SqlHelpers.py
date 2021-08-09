@@ -30,7 +30,7 @@ class SqlHelpers(object):
     #Get data in table from database
     #Return columns, data row
     @staticmethod
-    def ExecuteList(connection_string,query):
+    def ExecuteDict(connection_string,query):
         con = odbc.connect(connection_string)
         con.timeout = SqlHelpers.COMMAND_TIMEOUT
         cur = con.cursor()        
@@ -92,7 +92,7 @@ def Test_ExecuteNonQuery(connection_string):
 def Test_ExecuteList(connection_string):    
     print('Sql connection string :'+ connection_string)
     query = 'EXEC [dbo].[select_test]'
-    user_group_dataset = SqlHelpers.ExecuteList(connection_string, query)
+    user_group_dataset = SqlHelpers.ExecuteDict(connection_string, query)
 
     print('User_groups:\n')
     #print(columns)

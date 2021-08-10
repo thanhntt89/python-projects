@@ -8,6 +8,7 @@
 #Link: https://github.com/thanhntt89/python-projects/blob/main/database/SqlHelpers.py
 #Created date: 2021/08/08
 ############################################################
+import os
 import pyodbc as odbc
 import pandas as pd
 from configparser import ConfigParser
@@ -134,12 +135,12 @@ class SqlHelpers(object):
 
     #Load file config file
     #Info config file:
-    #Line 1: Section 1: [SQLCONFIG]
-    #Line 2: SERVER = 'SERVER NAME'
-    #Line 4: USER_NAME = 'USER_NAME'
-    #Line 5: PASSWORD = 'PASSWORD'
-    #Line 6: DATABASE = 'DATABASE'
-    #Line 7: TIMEOUT = 'TIMEOUT'
+    #Line 1: [SQLCONFIG]
+    #Line 2: SERVER = SERVER NAME
+    #Line 4: USER_NAME = USER_NAME
+    #Line 5: PASSWORDS = PASSWORD
+    #Line 6: DATABASE = DATABASE
+    #Line 7: TIMEOUT = TIMEOUT
     @staticmethod
     def LoadingFileConfig(config_file_path):
         try:
@@ -172,7 +173,8 @@ def main():
     #Test_Transaction(connection_string)
 
 def Test_LoadingFileConfig():
-    file_path = 'E:\Jimmii\Git\learning\python\database\sqlconfig.txt'
+    FILE_NAME= 'sqlconfig.txt'
+    file_path = os.path.join(os.path.dirname(__file__),FILE_NAME) #'E:\Jimmii\Git\learning\python\database\sqlconfig.txt'
     SqlHelpers.LoadingFileConfig(file_path)
     connection_string = SqlHelpers.GetConnectionString()
     print('Connection string: %s' % connection_string) 

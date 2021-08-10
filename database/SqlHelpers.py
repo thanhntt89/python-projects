@@ -10,6 +10,8 @@
 ############################################################
 import pyodbc as odbc
 import pandas as pd
+from configparser import ConfigParser
+
 class SqlHelpers(object):
     #Default connection information
     SERVER = 'WINSERVER2016'
@@ -130,6 +132,30 @@ class SqlHelpers(object):
             con.close()
             raise e.__traceback__
 
+    #Load file config file
+    #Info config file:
+    #Line 1: Section 1: [SQLCONFIG]
+    #Line 2: SERVER = 'SERVER NAME'
+    #Line 4: USER_NAME = 'USER_NAME'
+    #Line 5: PASSWORD = 'PASSWORD'
+    #Line 6: DATABASE = 'DATABASE'
+    #Line 7: TIMEOUT = 'TIMEOUT'
+    @staticmethod
+    def LoadingFileConfig(config_file_path):
+        try:
+            config = ConfigParser()
+            config.read(config_file_path)          
+
+            SqlHelpers.SERVER = config.get('SQLCONFIG','SERVER')
+            SqlHelpers.USER_NAME = config.get('SQLCONFIG','USER_NAME')
+            SqlHelpers.PASSWORDS = config.get('SQLCONFIG','PASSWORD')
+            SqlHelpers.DATABASE = config.get('SQLCONFIG','DATABASE')
+            SqlHelpers.TIMEOUT = config.get('SQLCONFIG','TIMEOUT')
+
+        except ValueError as e:
+            raise e.args
+
+
 def main():
     SqlHelpers.SERVER ='WINSERVER2016'
     SqlHelpers.DATABASE ='Wii'
@@ -137,12 +163,19 @@ def main():
     SqlHelpers.USER_NAME ='wiiAdmin'    
     connection_string = SqlHelpers.GetConnectionString()
     #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
-
+    #Test loading config 
+    Test_LoadingFileConfig()
     #test execute datasets
     #Test_ExecuteList(connection_string)
     #Test_ExecutePandas(connection_string)
-    Test_ExecuteNonQuery(connection_string)
+    #Test_ExecuteNonQuery(connection_string)
     #Test_Transaction(connection_string)
+
+def Test_LoadingFileConfig():
+    file_path = 'E:\Jimmii\Git\learning\python\database\sqlconfig.txt'
+    SqlHelpers.LoadingFileConfig(file_path)
+    connection_string = SqlHelpers.GetConnectionString()
+    print('Connection string: %s' % connection_string) 
 
 def Test_Transaction(connection_string):
     SqlHelpers.CreateTransaction(connection_string)

@@ -10,6 +10,30 @@ class SqlHelpers(object):
 
     connection_string = 'DRIVER={SQL Server};SERVER='+SERVER+';DATABASE='+DATABASE+';UID='+USER_NAME+';PWD='+ PASSWORDS
     
+    #transaction
+    transaction = ''
+
+    @staticmethod
+    def CreateTransaction(connection_string):
+        try:
+            con = odbc.connect(connection_string, autocommit=False)
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT     
+            SqlHelpers.transaction = con.cursor()           
+        except ValueError as e:
+            raise e.args
+
+    @staticmethod
+    def TransactionAdd(query):
+        SqlHelpers.transaction.execute(query)
+
+    @staticmethod
+    def TransactionCommitting():
+        try:
+            SqlHelpers.transaction.commit()       
+        except ValueError as e:
+            SqlHelpers.transaction.rollback() 
+            raise e.args
+
     @staticmethod
     def GetConnectionString():
         SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS 
@@ -85,8 +109,16 @@ def main():
     #test execute datasets
     #Test_ExecuteList(connection_string)
     #Test_ExecutePandas(connection_string)
-    Test_ExecuteNonQuery(connection_string)
+    #Test_ExecuteNonQuery(connection_string)
+    Test_Transaction(connection_string)
 
+def Test_Transaction(connection_string):
+    SqlHelpers.CreateTransaction(connection_string)
+    query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(14)'     
+    query1 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(15)'  
+    SqlHelpers.TransactionAdd(query)
+    SqlHelpers.TransactionAdd(query1) 
+    SqlHelpers.TransactionCommitting()
 
 def Test_ExecutePandas(connection_string):
     try: 

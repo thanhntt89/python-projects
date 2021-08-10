@@ -40,12 +40,16 @@ class SqlHelpers(object):
         except ValueError as e:
             raise e.args
 
+    ################################################################
     #Add query to transaction
+    ################################################################
     @staticmethod
     def TransactionAdd(query):
         SqlHelpers.transaction.execute(query)
 
+    ################################################################
     #Transaction committing to database
+    ################################################################
     @staticmethod
     def TransactionCommitting():
         try:
@@ -53,8 +57,10 @@ class SqlHelpers(object):
         except ValueError as e:
             SqlHelpers.transaction.rollback() 
             raise e.args
-
+    
+    #########################
     #Create connection string
+    #########################
     @staticmethod
     def GetConnectionString():
         SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS 
@@ -72,8 +78,10 @@ class SqlHelpers(object):
         except:
             return False
     
+    ################################################################
     #Get data in table from database
     #Return dict data
+    ################################################################
     @staticmethod
     def ExecuteDict(connection_string,query):
         try:
@@ -136,6 +144,7 @@ class SqlHelpers(object):
             con.close()
             raise e.__traceback__
 
+    #########################
     #Load file config file
     #Info config file:
     #Line 1: [SQLCONFIG]
@@ -144,6 +153,7 @@ class SqlHelpers(object):
     #Line 5: PASSWORDS = PASSWORD
     #Line 6: DATABASE = DATABASE
     #Line 7: TIMEOUT = TIMEOUT
+    #########################
     @staticmethod
     def LoadingFileConfig(config_file_path):
         try:
@@ -154,8 +164,8 @@ class SqlHelpers(object):
             SqlHelpers.USER_NAME = config.get('SQLCONFIG','USER_NAME')
             SqlHelpers.PASSWORDS = config.get('SQLCONFIG','PASSWORD')
             SqlHelpers.DATABASE = config.get('SQLCONFIG','DATABASE')
-            SqlHelpers.COMMAND_TIMEOUT = config.get('SQLCONFIG','COMMAND_TIMEOUT') 
-            SqlHelpers.CONNECTION_TIMEOUT = config.get('SQLCONFIG','CONNECTION_TIMEOUT')
+            SqlHelpers.COMMAND_TIMEOUT = int(config.get('SQLCONFIG','COMMAND_TIMEOUT')) 
+            SqlHelpers.CONNECTION_TIMEOUT = int(config.get('SQLCONFIG','CONNECTION_TIMEOUT'))
         except ValueError as e:
             raise e.args
 
@@ -165,13 +175,14 @@ def main():
     SqlHelpers.DATABASE ='Wii'
     SqlHelpers.PASSWORDS ='W_iiAdmin00000' 
     SqlHelpers.USER_NAME ='wiiAdmin'    
+    Test_LoadingFileConfig()
     connection_string = SqlHelpers.GetConnectionString()
     #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
     #Test loading config 
-    Test_LoadingFileConfig()
+   
     #test execute datasets
     #Test_ExecuteList(connection_string)
-    #Test_ExecutePandas(connection_string)
+    Test_ExecutePandas(connection_string)
     #Test_ExecuteNonQuery(connection_string)
     #Test_Transaction(connection_string)
 

@@ -1,4 +1,14 @@
-﻿import pyodbc as odbc
+﻿############################################################
+#SqlHelpers is class suport for connectting with SQL Server
+#Supported with transaction, return pandas object, dict object 
+#Support reading connection info from files config 
+############################################################
+#Created by: Nguyen Tat Thanh (Jimmii88)
+#Email: thanhntt89bk@gmail.com
+#Link: https://github.com/thanhntt89/python-projects/blob/main/database/SqlHelpers.py
+#Created date: 2021/08/08
+############################################################
+import pyodbc as odbc
 import pandas as pd
 class SqlHelpers(object):
     #Default connection information
@@ -8,11 +18,13 @@ class SqlHelpers(object):
     DATABASE = 'Wii'
     COMMAND_TIMEOUT = 5000
 
+    #Default connection string
     connection_string = 'DRIVER={SQL Server};SERVER='+SERVER+';DATABASE='+DATABASE+';UID='+USER_NAME+';PWD='+ PASSWORDS
     
-    #transaction
+    #transaction variable
     transaction = ''
 
+    #Create transaction object
     @staticmethod
     def CreateTransaction(connection_string):
         try:
@@ -22,10 +34,12 @@ class SqlHelpers(object):
         except ValueError as e:
             raise e.args
 
+    #Add query to transaction
     @staticmethod
     def TransactionAdd(query):
         SqlHelpers.transaction.execute(query)
 
+    #Transaction committing to database
     @staticmethod
     def TransactionCommitting():
         try:
@@ -34,6 +48,7 @@ class SqlHelpers(object):
             SqlHelpers.transaction.rollback() 
             raise e.args
 
+    #Create connection string
     @staticmethod
     def GetConnectionString():
         SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS 
@@ -82,7 +97,7 @@ class SqlHelpers(object):
     # SQL running with query parameter character ? and values array
     ###############################
     @staticmethod
-    def ExecuteNonQuery(connection_string, query,vales):
+    def ExecuteNonQueryWithParameters(connection_string, query,vales):
         try:
             con = odbc.connect(connection_string)
             con.timeout = SqlHelpers.COMMAND_TIMEOUT           
@@ -97,6 +112,23 @@ class SqlHelpers(object):
             con.close()
             raise e.__traceback__
 
+    #########################
+    # SQL running query without parameters
+    #########################
+    @staticmethod
+    def ExecuteNonQuery(connection_string, query):
+        try:
+            con = odbc.connect(connection_string, autocommit = True)
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT           
+            cur = con.cursor() 
+            cur.execute(query)            
+            cur.close()
+            con.close()
+        except ValueError as e:
+            cur.close()
+            con.rollback()
+            con.close()
+            raise e.__traceback__
 
 def main():
     SqlHelpers.SERVER ='WINSERVER2016'
@@ -109,8 +141,8 @@ def main():
     #test execute datasets
     #Test_ExecuteList(connection_string)
     #Test_ExecutePandas(connection_string)
-    #Test_ExecuteNonQuery(connection_string)
-    Test_Transaction(connection_string)
+    Test_ExecuteNonQuery(connection_string)
+    #Test_Transaction(connection_string)
 
 def Test_Transaction(connection_string):
     SqlHelpers.CreateTransaction(connection_string)
@@ -134,7 +166,9 @@ def Test_ExecuteNonQuery(connection_string):
         query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)'     
         values =('14')
 
-        SqlHelpers.ExecuteNonQuery(connection_string,query,values)      
+        SqlHelpers.ExecuteNonQueryWithParameters(connection_string,query,values)  
+        query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(15)'   
+        SqlHelpers.ExecuteNonQuery(connection_string,query) 
     except ValueError as e:
         print(f'error exception:{e}')
 

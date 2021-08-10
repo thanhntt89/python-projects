@@ -2,6 +2,13 @@
 #SqlHelpers is class suport for connectting with SQL Server
 #Supported with transaction, return pandas object, dict object 
 #Support reading connection info from files config 
+#File config example: 
+#[DATABASE]
+#SERVER = SERVER
+#USER_NAME = USER_NAME
+#PASSWORD = PASSWORD
+#CONNECTION_TIMEOUT =CONNECTION_TIMEOUT
+#COMMAND_TIMEOUT = COMMAND_TIMEOUT
 ############################################################
 #Created by: Nguyen Tat Thanh (Jimmii88)
 #Email: thanhntt89bk@gmail.com

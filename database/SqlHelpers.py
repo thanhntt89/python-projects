@@ -188,7 +188,7 @@ def main():
 
 def Test_LoadingFileConfig():
     FILE_NAME= 'sqlconfig.txt'
-    file_path = os.path.join(os.path.dirname(__file__),FILE_NAME) #'E:\Jimmii\Git\learning\python\database\sqlconfig.txt'
+    file_path = os.path.join(os.path.dirname(__file__),FILE_NAME) 
     SqlHelpers.LoadingFileConfig(file_path)
     connection_string = SqlHelpers.GetConnectionString()
     print('Connection string: %s' % connection_string) 

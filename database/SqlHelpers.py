@@ -19,7 +19,10 @@ class SqlHelpers(object):
     USER_NAME = 'wiiAdmin'
     PASSWORDS = 'W_iiAdmin00000'
     DATABASE = 'Wii'
+    #Time out execute query 
     COMMAND_TIMEOUT = 5000
+    #Time out check connection
+    CONNECTION_TIMEOUT = 300
 
     #Default connection string
     connection_string = 'DRIVER={SQL Server};SERVER='+SERVER+';DATABASE='+DATABASE+';UID='+USER_NAME+';PWD='+ PASSWORDS
@@ -61,7 +64,7 @@ class SqlHelpers(object):
     def test_connection(connection_string):        
         try:            
             con = odbc.connect(connection_string)
-            con.timeout = SqlHelpers.COMMAND_TIMEOUT
+            con.timeout = SqlHelpers.CONNECTION_TIMEOUT
             cur = con.cursor()
             cur.open()  
             cur.closest()
@@ -151,8 +154,8 @@ class SqlHelpers(object):
             SqlHelpers.USER_NAME = config.get('SQLCONFIG','USER_NAME')
             SqlHelpers.PASSWORDS = config.get('SQLCONFIG','PASSWORD')
             SqlHelpers.DATABASE = config.get('SQLCONFIG','DATABASE')
-            SqlHelpers.TIMEOUT = config.get('SQLCONFIG','TIMEOUT')
-
+            SqlHelpers.COMMAND_TIMEOUT = config.get('SQLCONFIG','COMMAND_TIMEOUT') 
+            SqlHelpers.CONNECTION_TIMEOUT = config.get('SQLCONFIG','CONNECTION_TIMEOUT')
         except ValueError as e:
             raise e.args
 

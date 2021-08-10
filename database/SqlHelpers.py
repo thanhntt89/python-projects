@@ -28,25 +28,31 @@ class SqlHelpers(object):
             return False
     
     #Get data in table from database
-    #Return columns, data row
+    #Return dict data
     @staticmethod
     def ExecuteDict(connection_string,query):
-        con = odbc.connect(connection_string)
-        con.timeout = SqlHelpers.COMMAND_TIMEOUT
-        cur = con.cursor()        
-        cur.execute(query) 
-        dat_row = cur.fetchall()
-        columns = [cols[0] for cols in cur.description] 
-        data = [dict(zip(columns, row)) for row in dat_row]
-        return data 
+        try:
+            con = odbc.connect(connection_string)
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT
+            cur = con.cursor()        
+            cur.execute(query) 
+            dat_row = cur.fetchall()
+            columns = [cols[0] for cols in cur.description] 
+            data = [dict(zip(columns, row)) for row in dat_row]
+            return data 
+        except Exception as e:
+            raise e.args
 
     @staticmethod
     def ExecutePandas(connection_string, query):
-        con = odbc.connect(connection_string)
-        con.timeout = SqlHelpers.COMMAND_TIMEOUT
-        cur = con.cursor()
-        data = pd.read_sql_query(query,con)
-        return data
+        try:    
+            con = odbc.connect(connection_string)
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT
+            cur = con.cursor()
+            data = pd.read_sql_query(query,con)
+            return data
+        except Exception as e:            
+            raise e.args
 
     ###############################
     # SQL running with query parameter character ? and values array

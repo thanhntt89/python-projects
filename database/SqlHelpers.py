@@ -15,10 +15,10 @@ from configparser import ConfigParser
 
 class SqlHelpers(object):
     #Default connection information
-    SERVER = 'WINSERVER2016'
-    USER_NAME = 'wiiAdmin'
-    PASSWORDS = 'W_iiAdmin00000'
-    DATABASE = 'Wii'
+    SERVER = ''
+    USER_NAME = ''
+    PASSWORDS = ''
+    DATABASE = ''
     #Time out execute query 
     COMMAND_TIMEOUT = 5000
     #Time out check connection
@@ -46,6 +46,13 @@ class SqlHelpers(object):
     @staticmethod
     def TransactionAdd(query):
         SqlHelpers.transaction.execute(query)
+
+    ################################
+    #Add query to transaction with parameters
+    ################################
+    @staticmethod
+    def TransactionAddWithParameters(query, parameters):
+        SqlHelpers.transaction.execute(query, parameters)
 
     ################################################################
     #Transaction committing to database
@@ -116,12 +123,9 @@ class SqlHelpers(object):
             con = odbc.connect(connection_string)
             con.timeout = SqlHelpers.COMMAND_TIMEOUT           
             cur = con.cursor() 
-            cur.execute(query, vales)
-            con.commit()
-            cur.close()
+            cur.execute(query, vales)   
             con.close()
         except ValueError as e:
-            cur.close()
             con.rollback()
             con.close()
             raise e.__traceback__
@@ -182,9 +186,9 @@ def main():
    
     #test execute datasets
     #Test_ExecuteList(connection_string)
-    Test_ExecutePandas(connection_string)
+    #Test_ExecuteDataFrame(connection_string)
     #Test_ExecuteNonQuery(connection_string)
-    #Test_Transaction(connection_string)
+    Test_Transaction(connection_string)
 
 def Test_LoadingFileConfig():
     FILE_NAME= 'sqlconfig.txt'
@@ -199,9 +203,17 @@ def Test_Transaction(connection_string):
     query1 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(15)'  
     SqlHelpers.TransactionAdd(query)
     SqlHelpers.TransactionAdd(query1) 
+
+    query2 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)' 
+    value2 = 16
+    query3 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)'
+    value3 = 17
+    SqlHelpers.TransactionAddWithParameters(query2,value2)
+    SqlHelpers.TransactionAddWithParameters(query3,value3)
+
     SqlHelpers.TransactionCommitting()
 
-def Test_ExecutePandas(connection_string):
+def Test_ExecuteDataFrame(connection_string):
     try: 
         query ='EXEC [dbo].[select_test]'
         data = SqlHelpers.ExecuteDataFrame(connection_string,query)

@@ -97,7 +97,7 @@ class SqlHelpers(object):
             raise e.args
 
     @staticmethod
-    def ExecutePandas(connection_string, query):
+    def ExecuteDataFrame(connection_string, query):
         try:    
             con = odbc.connect(connection_string)
             con.timeout = SqlHelpers.COMMAND_TIMEOUT
@@ -204,7 +204,7 @@ def Test_Transaction(connection_string):
 def Test_ExecutePandas(connection_string):
     try: 
         query ='EXEC [dbo].[select_test]'
-        data = SqlHelpers.ExecutePandas(connection_string,query)
+        data = SqlHelpers.ExecuteDataFrame(connection_string,query)
         print(data)
         print(type(data))
     except ValueError as e:

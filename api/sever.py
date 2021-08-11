@@ -1,11 +1,11 @@
-﻿from flask import Flask, jsonify
+﻿from flask import Flask
 import pandas as pd
 from modules.user import user
 
 class Server():
 
     app = Flask(__name__)    
-    app.config["DEBUG"] = True    
+    #app.config["DEBUG"] = True    
     app.register_blueprint(user.user_bp, url_prefix='/user/')
   
 

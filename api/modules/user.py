@@ -17,8 +17,8 @@ class user():
     @user_bp.route('/list/')
     def users():
         query ='SELECT [利用者ID] as user_id ,[権限グループ] as user_name ,[利用者名] as role  FROM [Wii].[dbo].[Fes利用者]'        
-        df = SqlHelpers.ExecuteDataFrame( SqlHelpers.GetConnectionString(), query)
-        return df.to_json()
+        df = SqlHelpers.ExecuteDataFrame(SqlHelpers.GetConnectionString(), query)
+        return df.to_json(orient="records")
 
 def main():
     print('this main user class')

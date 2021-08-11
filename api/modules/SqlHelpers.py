@@ -21,11 +21,15 @@ import pandas as pd
 from configparser import ConfigParser
 
 class SqlHelpers(object):
+
+    def __init__(self):
+        print('SqlHelpers')
+
     #Default connection information
-    SERVER = ''
-    USER_NAME = ''
-    PASSWORDS = ''
-    DATABASE = ''
+    SERVER = 'WINSERVER2016'
+    USER_NAME = 'wiiAdmin'
+    PASSWORDS = 'W_iiAdmin00000'
+    DATABASE = 'Wii'
     #Time out execute query 
     COMMAND_TIMEOUT = 5000
     #Time out check connection
@@ -179,79 +183,3 @@ class SqlHelpers(object):
             SqlHelpers.CONNECTION_TIMEOUT = int(config.get('SQLCONFIG','CONNECTION_TIMEOUT'))
         except ValueError as e:
             raise e.args
-
-
-def main():
-    SqlHelpers.SERVER ='WINSERVER2016'
-    SqlHelpers.DATABASE ='Wii'
-    SqlHelpers.PASSWORDS ='W_iiAdmin00000' 
-    SqlHelpers.USER_NAME ='wiiAdmin'    
-    Test_LoadingFileConfig()
-    connection_string = SqlHelpers.GetConnectionString()
-    #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
-    #Test loading config 
-   
-    #test execute datasets
-    #Test_ExecuteList(connection_string)
-    #Test_ExecuteDataFrame(connection_string)
-    #Test_ExecuteNonQuery(connection_string)
-    Test_Transaction(connection_string)
-
-def Test_LoadingFileConfig():
-    FILE_NAME= 'sqlconfig.txt'
-    file_path = os.path.join(os.path.dirname(__file__),FILE_NAME) 
-    SqlHelpers.LoadingFileConfig(file_path)
-    connection_string = SqlHelpers.GetConnectionString()
-    print('Connection string: %s' % connection_string) 
-
-def Test_Transaction(connection_string):
-    SqlHelpers.CreateTransaction(connection_string)
-    query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(14)'     
-    query1 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(15)'  
-    SqlHelpers.TransactionAdd(query)
-    SqlHelpers.TransactionAdd(query1) 
-
-    query2 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)' 
-    value2 = 16
-    query3 ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)'
-    value3 = 17
-    SqlHelpers.TransactionAddWithParameters(query2,value2)
-    SqlHelpers.TransactionAddWithParameters(query3,value3)
-
-    SqlHelpers.TransactionCommitting()
-
-def Test_ExecuteDataFrame(connection_string):
-    try: 
-        query ='EXEC [dbo].[select_test]'
-        data = SqlHelpers.ExecuteDataFrame(connection_string,query)
-        print(data)
-        print(type(data))
-    except ValueError as e:
-        print(f'error exception:{e}')
-
-def Test_ExecuteNonQuery(connection_string):
-    try:           
-        query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(?)'     
-        values =('14')
-
-        SqlHelpers.ExecuteNonQueryWithParameters(connection_string,query,values)  
-        query ='INSERT INTO dbo.[FestaVideoLock]([ContentType]) VALUES(15)'   
-        SqlHelpers.ExecuteNonQuery(connection_string,query) 
-    except ValueError as e:
-        print(f'error exception:{e}')
-
-def Test_ExecuteList(connection_string):    
-    print('Sql connection string :'+ connection_string)
-    query = 'EXEC [dbo].[select_test]'
-    user_group_dataset = SqlHelpers.ExecuteDict(connection_string, query)
-
-    print('User_groups:\n')
-    #print(columns)
-    print(user_group_dataset)
-    # for ug in user_group_dataset:
-    #     print(ug)
-
-    print(type(user_group_dataset))
-
-if __name__ == "__main__":
-    main()

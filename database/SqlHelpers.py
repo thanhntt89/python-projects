@@ -26,6 +26,7 @@ class SqlHelpers(object):
     USER_NAME = ''
     PASSWORDS = ''
     DATABASE = ''
+    PORT = 1433
     #Time out execute query 
     COMMAND_TIMEOUT = 5000
     #Time out check connection
@@ -77,17 +78,16 @@ class SqlHelpers(object):
     #########################
     @staticmethod
     def GetConnectionString():
-        SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS 
+        SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+','+str(SqlHelpers.PORT)+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS+';Time out = '+ str(SqlHelpers.CONNECTION_TIMEOUT)
         return SqlHelpers.connection_string
 
     @staticmethod
     def test_connection(connection_string):        
         try:            
             con = odbc.connect(connection_string)
-            con.timeout = SqlHelpers.CONNECTION_TIMEOUT
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT            
             cur = con.cursor()
-            cur.open()  
-            cur.closest()
+            cur.execute("select @@VERSION")
             return True
         except:
             return False
@@ -177,6 +177,7 @@ class SqlHelpers(object):
             SqlHelpers.DATABASE = config.get('SQLCONFIG','DATABASE')
             SqlHelpers.COMMAND_TIMEOUT = int(config.get('SQLCONFIG','COMMAND_TIMEOUT')) 
             SqlHelpers.CONNECTION_TIMEOUT = int(config.get('SQLCONFIG','CONNECTION_TIMEOUT'))
+            SqlHelpers.PORT = int(config.get('SQLCONFIG','PORT'))
         except ValueError as e:
             raise e.args
 
@@ -188,14 +189,15 @@ def main():
     SqlHelpers.USER_NAME ='wiiAdmin'    
     Test_LoadingFileConfig()
     connection_string = SqlHelpers.GetConnectionString()
-    #print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
+    print('connection string: '+ connection_string)
+    print('Test connected:' + str(SqlHelpers.test_connection(connection_string)))
     #Test loading config 
    
     #test execute datasets
     #Test_ExecuteList(connection_string)
     #Test_ExecuteDataFrame(connection_string)
     #Test_ExecuteNonQuery(connection_string)
-    Test_Transaction(connection_string)
+    #Test_Transaction(connection_string)
 
 def Test_LoadingFileConfig():
     FILE_NAME= 'sqlconfig.txt'

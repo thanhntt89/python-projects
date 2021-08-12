@@ -1,7 +1,6 @@
 ﻿from flask import Flask
 import pandas as pd
 from modules.user import user
-from modules.AuthorityUtils import AuthorityUtils as auth
 from modules.auth import auth
 class Server():
 

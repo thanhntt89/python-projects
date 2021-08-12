@@ -4,7 +4,7 @@ import jwt
 
 class AuthorityUtils():
 
-    authority_bp = Blueprint('login',__name__)
+    authority_bp = Blueprint('auth',__name__)
 
     def __init__(self):
         print('this is AuthorityUtils')

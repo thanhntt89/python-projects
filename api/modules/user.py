@@ -1,6 +1,6 @@
 ﻿from flask import Blueprint, jsonify, request
 from modules.SqlHelpers import SqlHelpers
-
+from modules.auth import auth
 class user():
 
     #User router 
@@ -12,9 +12,10 @@ class user():
     
     @user_bp.route('/')
     def index():
-        return jsonify('this is user index')
-
+        return jsonify('this is user index')        
+    
     @user_bp.route('/list/', methods=['GET','POST'])   
+    @auth.token_required
     def users():
         key = request.headers.get('key')
         print(f'key: {key}')

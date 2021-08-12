@@ -30,7 +30,7 @@ class auth():
                 return jsonify({'message':'Token is missing'}), 403 
 
             try:
-                data = jwt.decode(token,auth.SECRET_KEY, algorithm="HS256")
+                data = jwt.decode(token,auth.SECRET_KEY,algorithms=["HS256"], options={"verify_exp": False})
             except ValueError as e:
                print('error:'+e.message)
                return jsonify({'message':'Token is missing or invalid'}), 403
@@ -43,12 +43,13 @@ class auth():
     ################################
     #Get token by login user
     ################################
-    @auth_bp.route('/', methods=['POST', 'GET'])
+    @auth_bp.route('/token', methods=['POST', 'GET'])
     def getToken():
         authority = request.authorization
-        print (f'user: {authority.username} password: {authority.password}')
+        #print (f'user: {authority.username} password: {authority.password}')
+
         if authority and authority.username == auth.USER_DEFAULT and authority.password == auth.PASSWORD_DEFAULT:
-            token = jwt.encode({'user':authority.username, 'exp': datetime.datetime.now() + datetime.timedelta(minutes=60)}, auth.SECRET_KEY, algorithm="HS256")
-   
+            token = jwt.encode({'user':authority.username, 'exp': datetime.datetime.now() + datetime.timedelta(minutes=60)}, auth.SECRET_KEY)   
             return jsonify({'token': token.encode().decode('UTF-8')})
+
         return make_response('Could not verify!',401,{'WWW-Authenticate':'Basic realm ="Login required"'})

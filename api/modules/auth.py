@@ -1,5 +1,9 @@
 ###########################################################################
 #Install: flask, pyjwt, datetime, Flask-JWT-Extended==4.1.0 to use decoded tokens
+#Check token validity for method to protected endpoint
+#Use: set before function 
+#@auth.token_required
+#def functionName():
 ###########################################################################
 from configparser import Error
 import datetime
@@ -25,14 +29,14 @@ class auth():
         @wraps(f)
         def decorated(*args, **kwargs):
             token = request.args.get('token', None)
-            print('token_request: '+token)
+            #print('token_request: '+token)
             if not token:
                 return jsonify({'message':'Token is missing'}), 403 
 
             try:
-                data = jwt.decode(token,auth.SECRET_KEY,algorithms=["HS256"], options={"verify_exp": False})
+                data = jwt.decode(token,auth.SECRET_KEY,algorithms=["HS256"])#, options={"verify_exp": False}
             except ValueError as e:
-               print('error:'+e.message)
+               #print('error:'+e.message)
                return jsonify({'message':'Token is missing or invalid'}), 403
 
             return f(*args, **kwargs)

@@ -15,12 +15,13 @@ class user():
         return jsonify('this is user index')        
     
     @user_bp.route('/list/', methods=['GET','POST'])   
+    #Check token_required
     @auth.token_required
     def users():
-        key = request.headers.get('key')
-        print(f'key: {key}')
-        key_body = request.form.get('key_body')
-        print(f'key_body: {key_body}')
+        #key = request.headers.get('key')
+        #print(f'key: {key}')
+        #key_body = request.form.get('key_body')
+        #print(f'key_body: {key_body}')
         query = f'SELECT [利用者ID] as user_id ,[権限グループ] as user_name ,[利用者名] as role  FROM [Wii].[dbo].[Fes利用者]'        
         df = SqlHelpers.ExecuteDataFrame(SqlHelpers.GetConnectionString(), query)
         return df.to_json(orient="records")

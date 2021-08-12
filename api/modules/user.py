@@ -14,7 +14,7 @@ class user():
     def index():
         return jsonify('this is user index')
 
-    @user_bp.route('/list/')
+    @user_bp.route('/list/', methods=['GET','POST'])   
     def users():
         key = request.headers.get('key')
         print(f'key: {key}')

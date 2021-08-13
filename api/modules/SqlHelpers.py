@@ -21,15 +21,12 @@ import pandas as pd
 from configparser import ConfigParser
 
 class SqlHelpers(object):
-
-    def __init__(self):
-        print('SqlHelpers')
-
     #Default connection information
     SERVER = 'WINSERVER2016'
     USER_NAME = 'wiiAdmin'
     PASSWORDS = 'W_iiAdmin00000'
     DATABASE = 'Wii'
+    PORT = 1433
     #Time out execute query 
     COMMAND_TIMEOUT = 5000
     #Time out check connection
@@ -81,17 +78,16 @@ class SqlHelpers(object):
     #########################
     @staticmethod
     def GetConnectionString():
-        SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS 
+        SqlHelpers.connection_string = 'DRIVER={SQL Server};SERVER='+SqlHelpers.SERVER+','+str(SqlHelpers.PORT)+';DATABASE='+SqlHelpers.DATABASE+';UID='+SqlHelpers.USER_NAME+';PWD='+ SqlHelpers.PASSWORDS+';Time out = '+ str(SqlHelpers.CONNECTION_TIMEOUT)
         return SqlHelpers.connection_string
 
     @staticmethod
     def test_connection(connection_string):        
         try:            
             con = odbc.connect(connection_string)
-            con.timeout = SqlHelpers.CONNECTION_TIMEOUT
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT            
             cur = con.cursor()
-            cur.open()  
-            cur.closest()
+            cur.execute("select @@VERSION")
             return True
         except:
             return False
@@ -118,8 +114,7 @@ class SqlHelpers(object):
     def ExecuteDataFrame(connection_string, query):
         try:    
             con = odbc.connect(connection_string)
-            con.timeout = SqlHelpers.COMMAND_TIMEOUT
-            cur = con.cursor()
+            con.timeout = SqlHelpers.COMMAND_TIMEOUT          
             data = pd.read_sql_query(query,con)
             return data
         except Exception as e:            
@@ -181,5 +176,6 @@ class SqlHelpers(object):
             SqlHelpers.DATABASE = config.get('SQLCONFIG','DATABASE')
             SqlHelpers.COMMAND_TIMEOUT = int(config.get('SQLCONFIG','COMMAND_TIMEOUT')) 
             SqlHelpers.CONNECTION_TIMEOUT = int(config.get('SQLCONFIG','CONNECTION_TIMEOUT'))
+            SqlHelpers.PORT = int(config.get('SQLCONFIG','PORT'))
         except ValueError as e:
             raise e.args

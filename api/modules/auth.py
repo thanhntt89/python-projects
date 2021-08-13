@@ -28,8 +28,8 @@ class auth():
     def token_required(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            token = request.args.get('token', None)
-            #print('token_request: '+token)
+            token = request.form.get('token') # request.args.get('token')
+            print('token_request: '+token)
             if not token:
                 return jsonify({'message':'Token is missing'}), 403 
 

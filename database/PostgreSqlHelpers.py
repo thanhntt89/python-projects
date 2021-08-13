@@ -1,10 +1,10 @@
 ############################################################
-#SqlHelpers is class suport for connectting with postgre SQL
+#PostgreSqlHelper is class suport for connectting with postgre SQL
 #Supported with transaction, return pandas object, dict object 
 #Support reading connection info from files config 
 #File config example: 
-#[DATABASE]
-#SERVER = SERVER
+#[POSTGRECONFIG]
+#HOST = SERVER
 #USER_NAME = USER_NAME
 #PASSWORD = PASSWORD
 #CONNECTION_TIMEOUT =CONNECTION_TIMEOUT
@@ -16,26 +16,25 @@
 #Created date: 2021/08/08
 ############################################################
 import os
-import psycopg2 as psycopg2
+import psycopg2 as psycop
 import pandas as pd
 from configparser import ConfigParser
 
 class PostgreSqlHelper():
-    def __init__(self) -> None:
-        pass
-
+   
      #Default connection information
-    HOST = ''
+    SERVER = ''
     USER_NAME = ''
     PASSWORDS = ''
     DATABASE = ''
+    PORT = 5432
     #Time out execute query 
     COMMAND_TIMEOUT = 5000
     #Time out check connection
     CONNECTION_TIMEOUT = 300
 
     #Default connection string
-    connection_string = 'HOST='+HOST+';DATABASE='+DATABASE+';USER='+USER_NAME+';PASSWORD='+ PASSWORDS
+    connection_string = ''
     
     #transaction variable
     transaction = ''
@@ -44,7 +43,7 @@ class PostgreSqlHelper():
     @staticmethod
     def CreateTransaction(connection_string):
         try:
-            con = psycopg2.connect(connection_string, autocommit=False)
+            con = psycop.connect(connection_string, autocommit=False)
             con.timeout = PostgreSqlHelper.COMMAND_TIMEOUT     
             PostgreSqlHelper.transaction = con.cursor()           
         except ValueError as e:
@@ -73,26 +72,21 @@ class PostgreSqlHelper():
             PostgreSqlHelper.transaction.commit()       
         except ValueError as e:
             PostgreSqlHelper.transaction.rollback() 
-            raise e.args
-    
-    #########################
-    #Create connection string
-    #########################
-    @staticmethod
-    def GetConnectionString():
-        PostgreSqlHelper.connection_string = 'SERVER='+PostgreSqlHelper.HOST+';DATABASE='+PostgreSqlHelper.DATABASE+';UID='+PostgreSqlHelper.USER_NAME+';PWD='+ PostgreSqlHelper.PASSWORDS 
-        return PostgreSqlHelper.connection_string
+            raise e.args  
 
     @staticmethod
-    def test_connection(connection_string):        
-        try:            
-            con = psycopg2.connect(connection_string)
-            con.timeout = PostgreSqlHelper.CONNECTION_TIMEOUT
-            cur = con.cursor()
-            cur.open()  
-            cur.closest()
+    def GetConnection():
+        return psycop.connect(database=PostgreSqlHelper.DATABASE, user=PostgreSqlHelper.USER_NAME, password=PostgreSqlHelper.PASSWORDS, host=PostgreSqlHelper.SERVER, port=PostgreSqlHelper.PORT)
+
+    @staticmethod
+    def test_connection(connection):        
+        try:   
+            cur = connection.cursor()
+            cur.execute('select version()')  
+            print(cur.fetchone())          
             return True
-        except:
+        except ValueError as e:
+            e.__traceback__
             return False
     
     ################################################################
@@ -100,10 +94,8 @@ class PostgreSqlHelper():
     #Return dict data
     ################################################################
     @staticmethod
-    def ExecuteDict(connection_string,query):
-        try:
-            con = psycopg2.connect(connection_string)
-            con.timeout = PostgreSqlHelper.COMMAND_TIMEOUT
+    def ExecuteDict(con, query):
+        try:           
             cur = con.cursor()        
             cur.execute(query) 
             dat_row = cur.fetchall()
@@ -114,12 +106,9 @@ class PostgreSqlHelper():
             raise e.args
 
     @staticmethod
-    def ExecuteDataFrame(connection_string, query):
+    def ExecuteDataFrame(connection, query):
         try:    
-            con = psycopg2.connect(connection_string)
-            con.timeout = PostgreSqlHelper.COMMAND_TIMEOUT
-            cur = con.cursor()
-            data = pd.read_sql_query(query,con)
+            data = pd.read_sql_query(query,connection)
             return data
         except Exception as e:            
             raise e.args
@@ -128,34 +117,31 @@ class PostgreSqlHelper():
     # SQL running with query parameter character ? and values array
     ###############################
     @staticmethod
-    def ExecuteNonQueryWithParameters(connection_string, query,vales):
-        try:
-            con = psycopg2.connect(connection_string)
-            con.timeout = PostgreSqlHelper.COMMAND_TIMEOUT           
-            cur = con.cursor() 
+    def ExecuteNonQueryWithParameters(connection, query,vales):
+        try:              
+            #connection = PostgreSqlHelper.GetConnection()        
+            cur = connection.cursor() 
             cur.execute(query, vales)   
-            con.close()
+            connection.commit() 
+            connection.close()
         except ValueError as e:
-            con.rollback()
-            con.close()
+            connection.rollback()
+            connection.close()
             raise e.__traceback__
 
     #########################
     # SQL running query without parameters
     #########################
     @staticmethod
-    def ExecuteNonQuery(connection_string, query):
-        try:
-            con = psycopg2.connect(connection_string, autocommit = True)
-            con.timeout = PostgreSqlHelper.COMMAND_TIMEOUT           
-            cur = con.cursor() 
-            cur.execute(query)            
-            cur.close()
-            con.close()
-        except ValueError as e:
-            cur.close()
-            con.rollback()
-            con.close()
+    def ExecuteNonQuery(connection, query):
+        try:                       
+            cur = connection.cursor() 
+            cur.execute(query,vars=None)    
+            connection.commit() 
+            connection.close()
+        except ValueError as e:            
+            connection.rollback()
+            connection.close()
             raise e.__traceback__
 
     #########################
@@ -174,11 +160,44 @@ class PostgreSqlHelper():
             config = ConfigParser()
             config.read(config_file_path)          
 
-            PostgreSqlHelper.HOST = config.get('POSTGRECONFIG','HOST')
+            PostgreSqlHelper.SERVER = config.get('POSTGRECONFIG','SERVER')
             PostgreSqlHelper.USER_NAME = config.get('POSTGRECONFIG','USER_NAME')
             PostgreSqlHelper.PASSWORDS = config.get('POSTGRECONFIG','PASSWORD')
             PostgreSqlHelper.DATABASE = config.get('POSTGRECONFIG','DATABASE')
             PostgreSqlHelper.COMMAND_TIMEOUT = int(config.get('POSTGRECONFIG','COMMAND_TIMEOUT')) 
             PostgreSqlHelper.CONNECTION_TIMEOUT = int(config.get('POSTGRECONFIG','CONNECTION_TIMEOUT'))
+            PostgreSqlHelper.PORT = int(config.get('POSTGRECONFIG','PORT'))
         except ValueError as e:
             raise e.args
+        
+def main():
+    #test 
+    FILE_NAME= 'sqlconfig.txt'
+    file_path = os.path.join(os.path.dirname(__file__),FILE_NAME) 
+    PostgreSqlHelper.LoadingFileConfig(file_path)
+    print('Connection string:'+str(PostgreSqlHelper.test_connection(PostgreSqlHelper.GetConnection())))
+    #Test execute_non_query
+    Test_ExecuteNonQuery(PostgreSqlHelper.GetConnection())
+
+def Test_ExecuteNonQuery(connection):
+    query = "INSERT INTO (User) (UserName, UserId, Email, FullName) VALUES (%s,%s,%s,%s)"
+    parameters =(U'jimmii88',2,U'thanhntt89bk@gmail.com',U'Nguyen Tat Thanh')
+    postgres_insert_query = """ INSERT INTO %s (ID, MODEL, PRICE) VALUES (%s,%s,%s)""",U"mobile"
+    record_to_insert = (5, U'One Plus 6', 950)
+
+    columns = ["ID","Model","PRICE"]
+    values = [5,'One Plus 6',960]
+    query1= "insert into mobile (%s) values (%s)",','.join(columns)#,','.join(values)
+    print ("query1: "+ query1)
+    
+    # cursor = connection.cursor()
+    # cursor.execute(query1)
+    # connection.commit()
+    # count = cursor.rowcount
+    # #query = """INSERT INTO User (UserName, UserId, Email, FullName) VALUES (%s,%s,%s,%s);""", {'jimmii88','2','thanhntt89bk@gmail.com','Nguyen Tat Thanh',}
+    # PostgreSqlHelper.ExecuteNonQuery(connection, query)
+    #PostgreSqlHelper.ExecuteNonQueryWithParameters(connection, query,parameters)
+    
+
+if __name__ == '__main__':
+    main()

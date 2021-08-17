@@ -8,6 +8,7 @@ class threadutils(threading.Thread):
         self.counter = counter
         self.delay = delay
 
+    lock = threading.Lock() 
     def run(self):
         print('run threading name: '+ self.name)       
         while self.counter:

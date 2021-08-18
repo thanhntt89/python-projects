@@ -199,8 +199,14 @@ def main():
     #Test execute_non_query
     #Test_ExecuteNonQuery(connection_string)
     #Test_ExecuteNonQueryWithParameter(connection_string)
-    Test_ExecuteTransaction(connection_string)
-    Tes_ExecuteDick(connection_string)
+    #Test_ExecuteTransaction(connection_string)
+    #Tes_ExecuteDick(connection_string)
+    Test_ExecuteDataFrame(connection_string)
+
+
+def Test_ExecuteDataFrame(connection_string):
+    query ='select * from member'
+    print(PostgreSqlHelpers.ExecuteDataFrame(connection_string, query))
 
 def Tes_ExecuteDick(connection_string):
     #query ='create table test(id serial primary key, name varchar(255))'

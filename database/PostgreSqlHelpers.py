@@ -38,7 +38,7 @@ class PostgreSqlHelpers():
     
     #transaction variable
     transaction = ''
-
+    connection =''
     @staticmethod
     def GetConnectionString():
         PostgreSqlHelpers.connection_string = f"host='{PostgreSqlHelpers.SERVER}' dbname='{PostgreSqlHelpers.DATABASE}' user='{PostgreSqlHelpers.USER_NAME}' password='{PostgreSqlHelpers.PASSWORDS}' port='{PostgreSqlHelpers.PORT}'"
@@ -64,9 +64,10 @@ class PostgreSqlHelpers():
     @staticmethod
     def CreateTransaction(connection_string):
         try:
-            con = psycop.connect(connection_string, autocommit=False)
-            con.timeout = PostgreSqlHelpers.COMMAND_TIMEOUT     
-            PostgreSqlHelpers.transaction = con.cursor()           
+            PostgreSqlHelpers.connection = psycop.connect(connection_string)
+            PostgreSqlHelpers.connection.autocommit = False
+            #con.timeout = PostgreSqlHelpers.COMMAND_TIMEOUT     
+            PostgreSqlHelpers.transaction = PostgreSqlHelpers.connection.cursor()           
         except ValueError as e:
             raise e.args
 
@@ -90,9 +91,11 @@ class PostgreSqlHelpers():
     @staticmethod
     def TransactionCommitting():
         try:
-            PostgreSqlHelpers.transaction.commit()       
+            PostgreSqlHelpers.connection.commit()    
+            PostgreSqlHelpers.connection.close()    
         except ValueError as e:
-            PostgreSqlHelpers.transaction.rollback() 
+            PostgreSqlHelpers.connection.rollback() 
+            PostgreSqlHelpers.connection.close() 
             raise e.args  
 
    
@@ -195,7 +198,8 @@ def main():
     #print('Connection string:'+str(PostgreSqlHelpers.test_connection(connection)))
     #Test execute_non_query
     #Test_ExecuteNonQuery(connection_string)
-    Test_ExecuteNonQueryWithParameter(connection_string)
+    #Test_ExecuteNonQueryWithParameter(connection_string)
+    Test_ExecuteTransaction(connection_string)
     Tes_ExecuteDick(connection_string)
 
 def Tes_ExecuteDick(connection_string):
@@ -216,7 +220,15 @@ def Test_ExecuteNonQueryWithParameter(connection_string):
     query ='insert into member (username,fullname,email) values(%s,%s,%s)'
     parameters =('admin','Nguyen Tat Thanh','thanhntt89@yahoo.com')
     PostgreSqlHelpers.ExecuteNonQueryWithParameters(connection_string, query,parameters)
-    
 
+def Test_ExecuteTransaction(connection_string):
+    query = 'insert into member (username,fullname,email) values({0},{1},{2})'.format("'jimmii88'","'Nguyen Tat Thanh'","'thanhntt89bk@gmail.com'")  
+    query1 ='insert into member (username,fullname,email) values(%s,%s,%s)'
+    parameters =('admin','Nguyen Tat Thanh','thanhntt89@yahoo.com')
+
+    PostgreSqlHelpers.CreateTransaction(connection_string)
+    PostgreSqlHelpers.TransactionAdd(query)
+    PostgreSqlHelpers.TransactionAddWithParameters(query1, parameters)
+    PostgreSqlHelpers.TransactionCommitting()
 if __name__ == '__main__':
     main()

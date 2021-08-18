@@ -37,14 +37,14 @@ class SqlHelpers(object):
     
     #transaction variable
     transaction = ''
-
+    connection =''
     #Create transaction object
     @staticmethod
     def CreateTransaction(connection_string):
         try:
-            con = odbc.connect(connection_string, autocommit=False)
-            con.timeout = SqlHelpers.COMMAND_TIMEOUT     
-            SqlHelpers.transaction = con.cursor()           
+            SqlHelpers.connection = odbc.connect(connection_string, autocommit=False)
+            SqlHelpers.connection.timeout = SqlHelpers.COMMAND_TIMEOUT     
+            SqlHelpers.transaction = SqlHelpers.connection.cursor()           
         except ValueError as e:
             raise e.args
 
@@ -68,9 +68,11 @@ class SqlHelpers(object):
     @staticmethod
     def TransactionCommitting():
         try:
-            SqlHelpers.transaction.commit()       
+            SqlHelpers.transaction.commit()   
+            SqlHelpers.connection.close()    
         except ValueError as e:
             SqlHelpers.transaction.rollback() 
+            SqlHelpers.connection.close() 
             raise e.args
     
     #########################

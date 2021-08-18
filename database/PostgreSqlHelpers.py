@@ -222,12 +222,14 @@ def Test_ExecuteNonQueryWithParameter(connection_string):
     PostgreSqlHelpers.ExecuteNonQueryWithParameters(connection_string, query,parameters)
 
 def Test_ExecuteTransaction(connection_string):
-    query = 'insert into member (username,fullname,email) values({0},{1},{2})'.format("'jimmii88'","'Nguyen Tat Thanh'","'thanhntt89bk@gmail.com'")  
+    query = "INSERT INTO member (username,fullname,email) values('supperadmin','Administrator','admin@gmail.com')"
+    query0 = 'insert into member (username,fullname,email) values({0},{1},{2})'.format("'jimmii88'","'Nguyen Tat Thanh'","'thanhntt89bk@gmail.com'")  
     query1 ='insert into member (username,fullname,email) values(%s,%s,%s)'
     parameters =('admin','Nguyen Tat Thanh','thanhntt89@yahoo.com')
 
     PostgreSqlHelpers.CreateTransaction(connection_string)
     PostgreSqlHelpers.TransactionAdd(query)
+    PostgreSqlHelpers.TransactionAdd(query0)
     PostgreSqlHelpers.TransactionAddWithParameters(query1, parameters)
     PostgreSqlHelpers.TransactionCommitting()
 if __name__ == '__main__':

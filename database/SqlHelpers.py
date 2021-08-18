@@ -194,7 +194,7 @@ def main():
     #Test loading config 
    
     #test execute datasets
-    #Test_ExecuteList(connection_string)
+    Test_ExecuteDict(connection_string)
     #Test_ExecuteDataFrame(connection_string)
     #Test_ExecuteNonQuery(connection_string)
     #Test_Transaction(connection_string)
@@ -242,7 +242,7 @@ def Test_ExecuteNonQuery(connection_string):
     except ValueError as e:
         print(f'error exception:{e}')
 
-def Test_ExecuteList(connection_string):    
+def Test_ExecuteDict(connection_string):    
     print('Sql connection string :'+ connection_string)
     query = 'EXEC [dbo].[select_test]'
     user_group_dataset = SqlHelpers.ExecuteDict(connection_string, query)

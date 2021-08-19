@@ -2,6 +2,7 @@
 from modules.user import user
 from modules.auth import auth
 from modules.member import member
+from modules.getconnection import GetConnection
 class Server():
 
     API_VER = '/api/v2'
@@ -19,6 +20,10 @@ def main():
     #print('this main function')
     HOST ='localhost'
     PORT = 8888
+    
+    #Load connection string from file
+    GetConnection.LoadDataBaseConnection()
+
     server = Server()    
     server.app.run(host=HOST, port=PORT)
 

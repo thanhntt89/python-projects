@@ -34,7 +34,11 @@ class auth():
                 return jsonify({'message':'Method request json required'})
 
             req = request.get_json()           
-            
+
+            #Check key token in json object
+            if 'token' not in req:
+                return jsonify({'error_message':'Can''t find token in json request'})
+
             token = req['token'] #request.args.get('token')#request.form.get('token') #
             print('token_request: '+str(token))
             if not token:

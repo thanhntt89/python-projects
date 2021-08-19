@@ -22,10 +22,10 @@ from configparser import ConfigParser
 
 class SqlHelpers(object):
     #Default connection information
-    SERVER = 'WINSERVER2016'
-    USER_NAME = 'wiiAdmin'
-    PASSWORDS = 'W_iiAdmin00000'
-    DATABASE = 'Wii'
+    SERVER = ''
+    USER_NAME = ''
+    PASSWORDS = ''
+    DATABASE = ''
     PORT = 1433
     #Time out execute query 
     COMMAND_TIMEOUT = 5000

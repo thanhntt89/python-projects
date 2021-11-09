@@ -39,6 +39,7 @@ class PostgreSqlHelpers():
     #transaction variable
     transaction = ''
     connection =''
+    
     @staticmethod
     def GetConnectionString():
         PostgreSqlHelpers.connection_string = f"host='{PostgreSqlHelpers.SERVER}' dbname='{PostgreSqlHelpers.DATABASE}' user='{PostgreSqlHelpers.USER_NAME}' password='{PostgreSqlHelpers.PASSWORDS}' port='{PostgreSqlHelpers.PORT}'"

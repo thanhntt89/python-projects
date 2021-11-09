@@ -1,4 +1,5 @@
-﻿from flask import Flask
+﻿from logutils import LogUtils
+from flask import Flask
 from modules.user import user
 from modules.auth import auth
 from modules.member import member
@@ -23,6 +24,8 @@ def main():
     
     #Load connection string from file
     GetConnection.LoadDataBaseConnection()
+    #Load logging configuration
+    LogUtils.LoadLogConfiguration()
 
     server = Server()    
     server.app.run(host=HOST, port=PORT)

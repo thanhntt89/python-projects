@@ -6,7 +6,7 @@ class EmailSender():
     SMTP_SERVER = "smtp.gmail.com"
     SMTP_SERVER_PORT = "465"
     EMAIL_SENDER = "nguyen.tat.thanh@miyatsu.vn"
-    EMAIL_SENDER_PASSWORD = "It12345!"
+    EMAIL_SENDER_PASSWORD = "12345!"
     EMAIL_RECIVES =['thanhntt89bk@gmail.com','5tfethut@gmail.com']
     
     SUBJECT = 'Welcome!'
